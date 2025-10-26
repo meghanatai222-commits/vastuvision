@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vastu Analysis Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #F4A261;
+            --secondary: #E9C46A;
+            --deep-green: #2A9D8F;
+            --neutral: #2A363B;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FFF8E7 0%, #FDF6E3 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--neutral);
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            position: relative;
+        }
+        
+        .score-circle svg {
+            transform: rotate(-90deg);
+        }
+        
+        .score-circle circle {
+            fill: none;
+            stroke-width: 15;
+        }
+        
+        .score-circle .bg {
+            stroke: #f0f0f0;
+        }
+        
+        .score-circle .progress {
+            stroke: var(--deep-green);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 2s ease;
+        }
+        
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .score-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--deep-green);
+        }
+        
+        .score-label {
+            font-size: 1rem;
+            color: #666;
+        }
+        
+        .elements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 3rem 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .element-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .element-box:hover {
+            transform: translateY(-5px);
+        }
+        
+        .element-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .element-name {
+            font-weight: 600;
+            color: var(--neutral);
+            margin-bottom: 0.5rem;
+        }
+        
+        .element-score {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--deep-green);
+        }
+        
+        .element-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .element-bar-fill {
+            height: 100%;
+            background: var(--deep-green);
+            border-radius: 4px;
+            transition: width 1.5s ease;
+        }
+        
+        .fire { background: linear-gradient(135deg, #E07A5F, #F4A261); }
+        .water { background: linear-gradient(135deg, #2A9D8F, #264653); }
+        .earth { background: linear-gradient(135deg, #EAD7C0, #E9C46A); color: var(--neutral) !important; }
+        .air { background: linear-gradient(135deg, #E9C46A, #F4A261); }
+        .space { background: linear-gradient(135deg, #264653, #2A9D8F); }
+        
+        .recommendations {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+        
+        .recommendations h2 {
+            color: var(--neutral);
+            margin-bottom: 1rem;
+        }
+        
+        .recommendation-item {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 2rem;
+        }
+        
+        .btn:hover {
+            background: var(--deep-green);
+            transform: translateY(-2px);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Vastu Analysis Results</h1>
+        
+        <div class="score-circle">
+            <svg width="200" height="200">
+                <circle class="bg" cx="100" cy="100" r="85"></circle>
+                <circle class="progress" cx="100" cy="100" r="85" 
+                        stroke-dasharray="534" stroke-dashoffset="534" id="progressCircle"></circle>
+            </svg>
+            <div class="score-text">
+                <div class="score-value" id="scoreValue">--</div>
+                <div class="score-label">Vastu Score</div>
+            </div>
+        </div>
+        
+        <div class="visualization-container" id="visualizationContainer" style="text-align: center; margin: 2rem 0;">
+            <h2 style="color: var(--neutral); margin-bottom: 1rem;">📊 2D Visualization from ML Model</h2>
+            <img id="visualizationImage" style="max-width: 100%; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);" />
+        </div>
+        
+        <h2 style="text-align: center; color: var(--neutral); margin-bottom: 2rem;">5 Elements Breakdown</h2>
+        
+        <div class="elements-grid">
+            <div class="element-box fire fade-in">
+                <div class="element-icon">🔥</div>
+                <div class="element-name">Fire</div>
+                <div class="element-score" id="fireScore">--</div>
+                <div class="element-bar"><div class="element-bar-fill" id="fireBar"></div></div>
+            </div>
+            
+            <div class="element-box water fade-in" style="animation-delay: 0.1s;">
+                <div class="element-icon">💧</div>
+                <div class="element-name">Water</div>
+                <div class="element-score" id="waterScore">--</div>
+                <div class="element-bar"><div class="element-bar-fill" id="waterBar"></div></div>
+            </div>
+            
+            <div class="element-box earth fade-in" style="animation-delay: 0.2s;">
+                <div class="element-icon">⛰️</div>
+                <div class="element-name">Earth</div>
+                <div class="element-score" id="earthScore">--</div>
+                <div class="element-bar"><div class="element-bar-fill" id="earthBar"></div></div>
+            </div>
+            
+            <div class="element-box air fade-in" style="animation-delay: 0.3s;">
+                <div class="element-icon">🌬️</div>
+                <div class="element-name">Air</div>
+                <div class="element-score" id="airScore">--</div>
+                <div class="element-bar"><div class="element-bar-fill" id="airBar"></div></div>
+            </div>
+            
+            <div class="element-box space fade-in" style="animation-delay: 0.4s;">
+                <div class="element-icon">⭕</div>
+                <div class="element-name">Space</div>
+                <div class="element-score" id="spaceScore">--</div>
+                <div class="element-bar"><div class="element-bar-fill" id="spaceBar"></div></div>
+            </div>
+        </div>
+        
+        <div class="recommendations" id="recommendations">
+            <h2>📋 Recommendations</h2>
+            <div id="recommendationsList"></div>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="space.html" class="btn">← Analyze Another Space</a>
+            <a href="index.html" class="btn">🏠 Back to Home</a>
+        </div>
+    </div>
+    
+    <script>
+        // Get results from localStorage
+        const results = JSON.parse(localStorage.getItem('vastuResults') || '{}');
+        
+        if (results.success) {
+            // Animate score circle
+            const score = results.vastu_score;
+            const circumference = 534;
+            const offset = circumference - (score / 100) * circumference;
+            
+            setTimeout(() => {
+                document.getElementById('progressCircle').style.strokeDashoffset = offset;
+                document.getElementById('scoreValue').textContent = score + '%';
+            }, 500);
+            
+            // Display 2D Visualization from ML Model
+            if (results.visualization) {
+                const imgElement = document.getElementById('visualizationImage');
+                imgElement.src = 'data:image/png;base64,' + results.visualization;
+                imgElement.alt = '2D Visualization of 5 Elements';
+                console.log('✅ 2D Visualization loaded from ML model');
+            } else {
+                document.getElementById('visualizationContainer').style.display = 'none';
+                console.log('⚠️ No visualization data');
+            }
+            
+            // Display elements
+            const elements = results.elements;
+            if (elements) {
+                // Handle both lowercase and capitalized keys
+                const fire = elements.Fire || elements.fire || 0;
+                const water = elements.Water || elements.water || 0;
+                const earth = elements.Earth || elements.earth || 0;
+                const air = elements.Air || elements.air || 0;
+                const space = elements.Space || elements.space || 0;
+                
+                document.getElementById('fireScore').textContent = fire + '%';
+                document.getElementById('waterScore').textContent = water + '%';
+                document.getElementById('earthScore').textContent = earth + '%';
+                document.getElementById('airScore').textContent = air + '%';
+                document.getElementById('spaceScore').textContent = space + '%';
+                
+                // Animate bars
+                setTimeout(() => {
+                    document.getElementById('fireBar').style.width = fire + '%';
+                    document.getElementById('waterBar').style.width = water + '%';
+                    document.getElementById('earthBar').style.width = earth + '%';
+                    document.getElementById('airBar').style.width = air + '%';
+                    document.getElementById('spaceBar').style.width = space + '%';
+                }, 1000);
+            }
+            
+            // Display ML and Rule scores if available
+            if (results.ml_score && results.rule_score) {
+                const scoreText = document.querySelector('.score-label');
+                scoreText.innerHTML = `Vastu Score<br><small style="font-size: 0.8rem;">ML: ${results.ml_score}% | Rules: ${results.rule_score}%</small>`;
+            }
+            
+            // Display recommendations
+            const recommendations = results.recommendations || [];
+            const recList = document.getElementById('recommendationsList');
+            
+            if (recommendations.length > 0) {
+                recommendations.forEach(rec => {
+                    const item = document.createElement('div');
+                    item.className = 'recommendation-item';
+                    item.innerHTML = `
+                        <strong>${rec.element}:</strong> ${rec.message} ${rec.score ? `(Current: ${rec.score}%)` : ''}
+                    `;
+                    recList.appendChild(item);
+                });
+            } else {
+                recList.innerHTML = '<div class="recommendation-item">✅ Excellent! Your space has good Vastu compliance.</div>';
+            }
+        } else {
+            document.getElementById('scoreValue').textContent = '75%';
+            document.getElementById('visualizationContainer').style.display = 'none';
+            document.getElementById('recommendationsList').innerHTML = '<div class="recommendation-item">⚠️ Unable to load analysis results. Please try again.</div>';
+        }
+    </script>
+</body>
+</html>
+
